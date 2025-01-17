@@ -138,8 +138,10 @@ const gameGUI = (function() {
         boardSquares.addEventListener("click", function() {
             // calculate row and column indexes based on sequentially 
             // numbered divs
-            gameLogic.playTurn(Math.floor(index / 3),index % 3)
-            boardSquares.innerHTML = board.readSquare(Math.floor(index / 3),index % 3);
+            if(gameLogic.isGameOver() === "") {
+                gameLogic.playTurn(Math.floor(index / 3),index % 3)
+                boardSquares.innerHTML = board.readSquare(Math.floor(index / 3),index % 3);
+            }
             //showBoard();
             gameStatus.innerHTML = gameLogic.isGameOver();
             if(gameLogic.isGameOver() === "")
