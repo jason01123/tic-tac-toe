@@ -1,0 +1,49 @@
+
+* {
+    font-family: "Roboto", serif;
+    font-optical-sizing: auto;
+    font-weight: 300;
+    font-style: normal;
+    font-variation-settings:
+    "wdth" 100;
+}
+
+body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.board-container {
+    display: grid;
+    grid-template-columns: 50px 50px 50px;
+    border-style: solid;
+    border-width: 1px;
+    width: 150px;
+}
+
+.board-square {
+    height: 50px;
+    width: 50px;
+    border-style: solid;
+    border-width: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: antiquewhite;
+    font-weight: bold;
+    font-size: 1.5em;
+}
+
+.board-square:hover {
+    background-color: rgb(247, 212, 165);
+}
+
+button {
+    background-color: antiquewhite;
+    color: black;
+    font-weight: bold;
+    border-radius: 5px;
+    padding: 5px 10px;
+}

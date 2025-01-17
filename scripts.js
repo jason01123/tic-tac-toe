@@ -7,24 +7,33 @@ const board = (function () {
     const isEmptySpace = (row,col) => {
         return boardArray[row][col] === '_';
     }
-    return {playX, playO, toString, readSquare, isEmptySpace};
+    const reset = () => boardArray = [['_','_','_'],['_','_','_'],['_','_','_']];
+    return {playX, playO, toString, readSquare, isEmptySpace, reset};
 })();
 
 const gameLogic = (function (board) {
-    let turn = 'O';
-    let gameOver = false;
+    let turn = 'X';
     const playTurn = (row,col) => {
         if(board.isEmptySpace(row,col)){
-            if(turn === 'O') {
-                turn = 'X';
+            if(turn === 'X') {
+                turn = 'O';
                 board.playX(row,col);
             }
             else {
-                turn = 'O';
+                turn = 'X';
                 board.playO(row,col);
             }
         }
     }
+
+    const getTurn = () => {
+        return turn;
+    }
+
+    const resetTurn = () => {
+        turn = 'X';
+    }
+
     const isGameOver = () => {
         let foundEmptySpace = false;
         let xCount = 0;
@@ -48,7 +57,7 @@ const gameLogic = (function (board) {
             xCount = 0;
             oCount = 0;
         }
-        // check cols for win
+        // check cols for win ***********************
         xCount = 0;
         oCount = 0;
         for(let col = 0; col < 3; col++) {
@@ -61,8 +70,8 @@ const gameLogic = (function (board) {
                 else if(board.readSquare(row,col) === 'O')
                     oCount++;
             }
-                //console.log("xCount: " + xCount);
-                //console.log("oCount: " + oCount);
+            //console.log("xCount: " + xCount);
+            //console.log("oCount: " + oCount);
             if(xCount === 3)
                 return "X Wins";
             else if(oCount === 3)
@@ -70,41 +79,123 @@ const gameLogic = (function (board) {
             xCount = 0;
             oCount = 0;
         }
+        // check for diagonal top left to bottom right win *********
+        xCount = 0;
+        oCount = 0;
+        if(board.readSquare(0,0) === 'X')
+            xCount++;
+        else if(board.readSquare(0,0) === 'O')
+            oCount++;
+        if(board.readSquare(1,1) === 'X')
+            xCount++;
+        else if(board.readSquare(1,1) === 'O')
+            oCount++;
+        if(board.readSquare(2,2) === 'X')
+            xCount++;
+        else if(board.readSquare(2,2) === 'O')
+            oCount++;
+        if(xCount === 3)
+            return "X Wins";
+        else if(oCount === 3)
+            return "O Wins";
+        // check for diagonal bottom left to top right win *********
+        xCount = 0;
+        oCount = 0;
+        if(board.readSquare(0,2) === 'X')
+            xCount++;
+        else if(board.readSquare(0,2) === 'O')
+            oCount++;
+        if(board.readSquare(1,1) === 'X')
+            xCount++;
+        else if(board.readSquare(1,1) === 'O')
+            oCount++;
+        if(board.readSquare(2,0) === 'X')
+            xCount++;
+        else if(board.readSquare(2,0) === 'O')
+            oCount++;
+        if(xCount === 3)
+            return "X Wins";
+        else if(oCount === 3)
+            return "O Wins";
+
+        // check for tie ***********************        
         if(!foundEmptySpace)
-            return "Tie";
+            return "Tie game!";
         else
-            return "No Winner Yet";   
+            return "";   // game still in progress
     }
-    return {playTurn, isGameOver};
+    return {playTurn, isGameOver, getTurn, resetTurn};
 })(board);
 
-gameLogic.playTurn(0,0);
-console.log(gameLogic.isGameOver());
-showBoard();
-gameLogic.playTurn(1,1);
-console.log(gameLogic.isGameOver());
-showBoard();
-gameLogic.playTurn(0,2);
-console.log(gameLogic.isGameOver());
-showBoard();
-gameLogic.playTurn(1,0);
-console.log(gameLogic.isGameOver());
-showBoard();
-gameLogic.playTurn(1,2);
-console.log(gameLogic.isGameOver());
-showBoard();
-gameLogic.playTurn(2,2);
-console.log(gameLogic.isGameOver());
-showBoard();
-gameLogic.playTurn(2,0);
-console.log(gameLogic.isGameOver());
-showBoard();
-gameLogic.playTurn(0,1);
-console.log(gameLogic.isGameOver());
-showBoard();
+
+const gameGUI = (function() {
+    const boardSquares = document.querySelectorAll(".board-square");
+    const gameStatus = document.querySelector(".game-status");
+    const gameTurn = document.querySelector(".game-turn");
+    const restartBtn = document.querySelector(".restart-btn");
+    const boardSquareArray = Array.from(boardSquares);
+    boardSquareArray.forEach((boardSquares, index) => {
+        boardSquares.addEventListener("click", function() {
+            // calculate row and column indexes based on sequentially 
+            // numbered divs
+            gameLogic.playTurn(Math.floor(index / 3),index % 3)
+            boardSquares.innerHTML = board.readSquare(Math.floor(index / 3),index % 3);
+            //showBoard();
+            gameStatus.innerHTML = gameLogic.isGameOver();
+            if(gameLogic.isGameOver() === "")
+                gameStatus.innerHTML = gameLogic.getTurn() + "'s turn to play";
+
+        });
+    });
+    restartBtn.addEventListener("click", function() {
+        board.reset();
+        boardSquareArray.forEach((boardSquares) => {
+            boardSquares.innerHTML = "";
+        });
+        gameStatus.innerHTML = "X's turn to play";
+        //gameStatus.innerHTML = "";
+        gameLogic.resetTurn();
+    })
+})();
+
+
+/* console.log("It is " + gameLogic.getTurn() + "s turn.");
 gameLogic.playTurn(2,1);
 console.log(gameLogic.isGameOver());
 showBoard();
+console.log("It is " + gameLogic.getTurn() + "s turn.");
+gameLogic.playTurn(0,0);
+console.log(gameLogic.isGameOver());
+showBoard();
+console.log("It is " + gameLogic.getTurn() + "s turn.");
+gameLogic.playTurn(0,2);
+console.log(gameLogic.isGameOver());
+showBoard();
+console.log("It is " + gameLogic.getTurn() + "s turn.");
+gameLogic.playTurn(1,0);
+console.log(gameLogic.isGameOver());
+showBoard();
+console.log("It is " + gameLogic.getTurn() + "s turn.");
+gameLogic.playTurn(1,2);
+console.log(gameLogic.isGameOver());
+showBoard();
+console.log("It is " + gameLogic.getTurn() + "s turn.");
+gameLogic.playTurn(2,2);
+console.log(gameLogic.isGameOver());
+showBoard();
+console.log("It is " + gameLogic.getTurn() + "s turn.");
+gameLogic.playTurn(2,0);
+console.log(gameLogic.isGameOver());
+showBoard();
+console.log("It is " + gameLogic.getTurn() + "s turn.");
+gameLogic.playTurn(1,1);
+console.log(gameLogic.isGameOver());
+showBoard();
+console.log("It is " + gameLogic.getTurn() + "s turn.");
+gameLogic.playTurn(0,1);
+console.log(gameLogic.isGameOver());
+showBoard(); */
+
 
 function showBoard() {
     let str = "";
