@@ -47,12 +47,16 @@ form {
 }
 
 button {
-    margin-top: 5px;
+    margin-top: 20px;
     background-color: antiquewhite;
     color: black;
     font-weight: bold;
     border-radius: 5px;
     padding: 5px 10px;
+}
+
+button:hover {
+    background-color: rgb(247, 212, 165);
 }
 
 h2 {
