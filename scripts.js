@@ -48,12 +48,10 @@ const gameLogic = (function (board) {
                 else if(board.readSquare(row,col) === 'O')
                     oCount++;
             }
-             //console.log("xCount: " + xCount);
-             //console.log("oCount: " + oCount);
             if(xCount === 3)
-                return "X Wins";
+                return players.getPlayer1Name() + " Wins";
             else if(oCount === 3)
-                return "O Wins";
+                return players.getPlayer2Name() + " Wins";
             xCount = 0;
             oCount = 0;
         }
@@ -61,7 +59,6 @@ const gameLogic = (function (board) {
         xCount = 0;
         oCount = 0;
         for(let col = 0; col < 3; col++) {
-            //console.log("col: " + col);
             for(let row = 0; row < 3; row++) {
                 if(board.isEmptySpace(row,col))
                     foundEmptySpace = true; 
@@ -70,12 +67,10 @@ const gameLogic = (function (board) {
                 else if(board.readSquare(row,col) === 'O')
                     oCount++;
             }
-            //console.log("xCount: " + xCount);
-            //console.log("oCount: " + oCount);
             if(xCount === 3)
-                return "X Wins";
+                return players.getPlayer1Name() + " Wins";
             else if(oCount === 3)
-                return "O Wins";
+                return players.getPlayer2Name() + " Wins";
             xCount = 0;
             oCount = 0;
         }
@@ -95,9 +90,9 @@ const gameLogic = (function (board) {
         else if(board.readSquare(2,2) === 'O')
             oCount++;
         if(xCount === 3)
-            return "X Wins";
+            return players.getPlayer1Name() + " Wins";
         else if(oCount === 3)
-            return "O Wins";
+            return players.getPlayer2Name() + " Wins";
         // check for diagonal bottom left to top right win *********
         xCount = 0;
         oCount = 0;
@@ -114,9 +109,9 @@ const gameLogic = (function (board) {
         else if(board.readSquare(2,0) === 'O')
             oCount++;
         if(xCount === 3)
-            return "X Wins";
+            return players.getPlayer1Name() + " Wins";
         else if(oCount === 3)
-            return "O Wins";
+            return players.getPlayer2Name() + " Wins";;
 
         // check for tie ***********************        
         if(!foundEmptySpace)
@@ -128,10 +123,33 @@ const gameLogic = (function (board) {
 })(board);
 
 
+const players = (function() {
+    let player1 = "";
+    let player2 = "";
+    const getPlayer1Name = () => player1;
+    const getPlayer2Name = () => player2;
+    const setPlayer1Name = (name) => {
+        player1 = name;
+    };
+    const setPlayer2Name = (name) => {
+        player2 = name;
+    };
+    return {getPlayer1Name, getPlayer2Name, setPlayer1Name, setPlayer2Name}
+})();
+
 const gameGUI = (function() {
+
+    const dialog = document.querySelector("dialog");
+    dialog.showModal();
+    const okButton = document.querySelector(".ok-button");
+    okButton.addEventListener("click", () => {
+        players.setPlayer1Name(document.querySelector("#player1").value);
+        players.setPlayer2Name(document.querySelector("#player2").value);
+        gameStatus.innerHTML = players.getPlayer1Name() + "'s turn to play";
+        dialog.close();
+    });
     const boardSquares = document.querySelectorAll(".board-square");
     const gameStatus = document.querySelector(".game-status");
-    const gameTurn = document.querySelector(".game-turn");
     const restartBtn = document.querySelector(".restart-btn");
     const boardSquareArray = Array.from(boardSquares);
     boardSquareArray.forEach((boardSquares, index) => {
@@ -142,11 +160,16 @@ const gameGUI = (function() {
                 gameLogic.playTurn(Math.floor(index / 3),index % 3)
                 boardSquares.innerHTML = board.readSquare(Math.floor(index / 3),index % 3);
             }
-            //showBoard();
             gameStatus.innerHTML = gameLogic.isGameOver();
             if(gameLogic.isGameOver() === "")
-                gameStatus.innerHTML = gameLogic.getTurn() + "'s turn to play";
-
+            {
+                let currentPlayer = "";
+                if(gameLogic.getTurn() === "X")
+                    currentPlayer = players.getPlayer1Name();
+                else
+                    currentPlayer = players.getPlayer2Name();
+                gameStatus.innerHTML = currentPlayer + "'s turn to play";
+            }
         });
     });
     restartBtn.addEventListener("click", function() {
@@ -154,59 +177,7 @@ const gameGUI = (function() {
         boardSquareArray.forEach((boardSquares) => {
             boardSquares.innerHTML = "";
         });
-        gameStatus.innerHTML = "X's turn to play";
-        //gameStatus.innerHTML = "";
+        gameStatus.innerHTML = players.getPlayer1Name() + " turn to play";
         gameLogic.resetTurn();
     })
 })();
-
-
-/* console.log("It is " + gameLogic.getTurn() + "s turn.");
-gameLogic.playTurn(2,1);
-console.log(gameLogic.isGameOver());
-showBoard();
-console.log("It is " + gameLogic.getTurn() + "s turn.");
-gameLogic.playTurn(0,0);
-console.log(gameLogic.isGameOver());
-showBoard();
-console.log("It is " + gameLogic.getTurn() + "s turn.");
-gameLogic.playTurn(0,2);
-console.log(gameLogic.isGameOver());
-showBoard();
-console.log("It is " + gameLogic.getTurn() + "s turn.");
-gameLogic.playTurn(1,0);
-console.log(gameLogic.isGameOver());
-showBoard();
-console.log("It is " + gameLogic.getTurn() + "s turn.");
-gameLogic.playTurn(1,2);
-console.log(gameLogic.isGameOver());
-showBoard();
-console.log("It is " + gameLogic.getTurn() + "s turn.");
-gameLogic.playTurn(2,2);
-console.log(gameLogic.isGameOver());
-showBoard();
-console.log("It is " + gameLogic.getTurn() + "s turn.");
-gameLogic.playTurn(2,0);
-console.log(gameLogic.isGameOver());
-showBoard();
-console.log("It is " + gameLogic.getTurn() + "s turn.");
-gameLogic.playTurn(1,1);
-console.log(gameLogic.isGameOver());
-showBoard();
-console.log("It is " + gameLogic.getTurn() + "s turn.");
-gameLogic.playTurn(0,1);
-console.log(gameLogic.isGameOver());
-showBoard(); */
-
-
-function showBoard() {
-    let str = "";
-    for(let i = 0; i < 3; i++) {
-        for(let j = 0; j < 3; j++) {
-            str += board.readSquare(i,j) + "  ";
-        }
-        console.log(str + "\n");
-        str = "";
-    }
-}
-

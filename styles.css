@@ -40,10 +40,21 @@ body {
     background-color: rgb(247, 212, 165);
 }
 
+form {
+    display: grid;
+    gap: 10px;
+    grid-template-columns: 1fr;
+}
+
 button {
+    margin-top: 5px;
     background-color: antiquewhite;
     color: black;
     font-weight: bold;
     border-radius: 5px;
     padding: 5px 10px;
+}
+
+h2 {
+    margin: 0;
 }
